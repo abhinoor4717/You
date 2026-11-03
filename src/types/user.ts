@@ -10,3 +10,8 @@ export interface User extends RowDataPacket {
   birthday: Date | string; // Date or string depending on your MySQL driver config
   created_at?: Date;     // Optional because it has a default value on insert
 }
+
+export type PublicUser = Pick<User, "uuid" | "first_name" | "last_name" | "username"> & {
+  followers_count: number,
+  following_count: number,
+};

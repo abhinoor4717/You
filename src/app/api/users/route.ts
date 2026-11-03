@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import type { User } from "@/types/user";

@@ -26,38 +26,37 @@
 } */
 
 body {
-  color: #493522;
+  color: #262044;
   background:
-    radial-gradient(circle at 15% 10%, rgb(255 255 255 / 75%), transparent 28%),
-    linear-gradient(rgb(120 78 42 / 5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(120 78 42 / 5%) 1px, transparent 1px),
-    #fffaf0;
-  background-size: auto, 24px 24px, 24px 24px;
-  background-attachment: fixed;
+    radial-gradient(circle at 12% 12%, rgb(244 114 182 / 18%), transparent 24%),
+    radial-gradient(circle at 88% 80%, rgb(34 211 238 / 18%), transparent 28%),
+    linear-gradient(rgb(79 70 160 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(79 70 160 / 5%) 1px, transparent 1px),
+    #f7f5ff;
+  background-size: auto, auto, 24px 24px, 24px 24px;
 }
 
 .pixel-panel {
-  border: 2px solid #b98243;
-  background: rgb(255 253 247 / 96%);
-  box-shadow: 4px 4px 0 #dfc28a;
+  border: 3px solid #262044;
+  background: #fff;
+  box-shadow: 6px 6px 0 #a78bfa;
 }
 
-.pixel-link {
+.pixel-nav-link {
   border: 2px solid transparent;
-  color: #73563b;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  transition: transform 120ms steps(2, end), box-shadow 120ms steps(2, end);
 }
 
-.pixel-link:hover {
+.pixel-nav-link:hover {
   transform: translate(-2px, -2px);
-  border-color: #e4a44c;
-  background: #fff5de;
-  box-shadow: 4px 4px 0 #dfc28a;
+  border-color: #262044;
+  background: #ecfeff;
+  box-shadow: 3px 3px 0 #22d3ee;
 }
 
-.pixel-link-active {
-  border-color: #c96d42;
-  background: #ffead8;
-  color: #713b2b;
-  box-shadow: 4px 4px 0 #dda477;
+.pixel-nav-link-active {
+  border-color: #262044;
+  background: #ede9fe;
+  color: #5b21b6;
+  box-shadow: 3px 3px 0 #a78bfa;
 }

@@ -28,7 +28,7 @@ export default function Home() {
       <div className="m-3">
         <Link
           href="/app"
-          className="pixel-link pixel-link-active flex items-center gap-3 px-3 py-3 font-mono text-sm"
+          className="pixel-nav-link pixel-nav-link-active flex items-center gap-3 px-3 py-3 font-mono text-sm"
         >
           Get Started
         </Link>

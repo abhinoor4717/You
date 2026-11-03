@@ -9,13 +9,10 @@ export async function proxy(request: NextRequest) {
   if (pathname === "/app" || pathname.startsWith("/app/")) {
     const session = await auth0.getSession(request);
 
+    // Check for auth0 session
+    const loginUrl = new URL("/auth/login", request.url);
     if (!session) {
-      const loginUrl = new URL("/auth/login", request.url);
-
-      loginUrl.searchParams.set(
-        "returnTo",
-        pathname + request.nextUrl.search
-      );
+      loginUrl.searchParams.set("returnTo", pathname + request.nextUrl.search);
 
       const screenHint = searchParams.get("screen_hint");
 
