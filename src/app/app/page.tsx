@@ -38,9 +38,10 @@ export default function App() {
                     throw new Error(data.error || "Failed to fetch users");
                 }
 
-                setUsers(data.result ?? []);
-
-                if (users.length == 0) router.replace("/app/onboarding");
+                const result = data.result ?? [];
+                setUsers(result);
+                
+                if (result.lenght === 0) router.replace("/app/onboarding");
             } catch (err) {
                 console.error("Fetch error:", err);
                 setError(

@@ -19,6 +19,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+    env_file:
+      - .env.local
 
 volumes:
   mysql_data:

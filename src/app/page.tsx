@@ -15,22 +15,22 @@ export default function Home() {
       router.replace("/app");
     }
   }, [user, router]);
-
+ 
   if (isLoading || user) {
     return <p>Loading...</p>;
   }
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center font-mono">
+    <div className="flex gap-2 h-screen flex-col items-center justify-center font-mono">
       <h1 className="text-8xl">You</h1>
       <p>Your personal everything dashboard.</p>
 
       <div className="m-3">
         <Link
-          href="/app?screen_hint=signup"
-          className="rounded-2xl bg-white p-1.5 text-black hover:bg-slate-200"
+          href="/app"
+          className="pixel-link pixel-link-active flex items-center gap-3 px-3 py-3 font-mono text-sm"
         >
-          Get started
+          Get Started
         </Link>
       </div>
     </div>
