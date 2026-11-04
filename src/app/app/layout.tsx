@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Sidebar from "@/components/sidebar";
-import { getCurrentUser } from "@/lib/auth/getCurrentUser";
+import { getCurrentUser } from "@/lib/services/getCurrentUser";
 import { UserProvider } from "./UserProvider";
 import { redirect } from "next/navigation";
 

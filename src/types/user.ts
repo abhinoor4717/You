@@ -1,5 +1,15 @@
 import { RowDataPacket } from "mysql2";
 
+export interface DbUser extends RowDataPacket {
+    uuid: string,
+    username: string,
+    email: string,
+    first_name: string,
+    last_name: string,
+    birthday: Date | string,
+    created_at: Date
+}
+
 export interface User extends RowDataPacket {
   uuid: string;
   username: string;
@@ -11,6 +21,6 @@ export interface User extends RowDataPacket {
 }
 
 export type PublicUser = Pick<User, "uuid" | "first_name" | "last_name" | "username"> & {
-  followers_count?: number,
-  following_count?: number,
+  followers: string[],
+  following: string[]
 };

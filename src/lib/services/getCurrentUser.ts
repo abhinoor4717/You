@@ -14,8 +14,8 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
 
     try {
         const sessionEmail = session.user.email!;
-        
-        const [rows] = await pool.query<User[]>(
+
+        const [rows] = await pool?.query<User[]>(
             "SELECT * FROM users WHERE email = ?",
             [sessionEmail]
         );

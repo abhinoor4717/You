@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { PublicUser } from "@/types/user";
 import { useUser } from "../../UserProvider";
+import { ApiResponse } from "@/types/apiResponse";
+import { FollowData } from "@/app/api/follows/route";
 
 export default function ProfileDynamic() {
   const router = useRouter();
@@ -16,49 +18,77 @@ export default function ProfileDynamic() {
   const [loading, setLoading] = useState(true);
 
   const [isFollowing, setIsFollowing] = useState(false);
-const [followPending, setFollowPending] = useState(false);
-const [followError, setFollowError] = useState("");
+  const [followPending, setFollowPending] = useState(false);
+  const [followError, setFollowError] = useState("");
 
   useEffect(() => {
-    const controller = new AbortController();
+  const controller = new AbortController();
 
-    if (currentUser.username === username) router.replace("/app/profile");
-
-    async function fetchUser() {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `/api/users/exists?username=${encodeURIComponent(username)}`,
-          { signal: controller.signal },
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch profile.");
-
-        const data: { exist: boolean; user?: PublicUser } = await res.json();
-
-        if (!data.exist || !data.user) {
-          router.replace("/app");
-          return;
-        }
-
-        setUser(data.user);
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("Error fetching profile:", error);
-          router.replace("/app");
-        }
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
-      }
-    }
-
-    void fetchUser();
-
+  if (currentUser?.username === username) {
+    router.replace("/app/profile");
     return () => controller.abort();
-  }, [username, router]);
+  }
 
-  async function toggleFollow() {
-  if (!user || followPending) return;
+  async function fetchUser() {
+    try {
+      setLoading(true);
+
+      const userRes = await fetch(
+        `/api/users/exists?username=${encodeURIComponent(username)}`,
+        { signal: controller.signal }
+      );
+
+      if (!userRes.ok) throw new Error("Failed to fetch profile.");
+
+      const userResult: { exist: boolean; user?: PublicUser } =
+        await userRes.json();
+
+      if (!userResult.exist || !userResult.user) {
+        router.replace("/app");
+        return;
+      }
+
+      const profile = userResult.user;
+
+      const followsRes = await fetch(
+        `/api/follows?uuid=${encodeURIComponent(profile.uuid)}`,
+        { signal: controller.signal }
+      );
+
+      const followsResult: ApiResponse<FollowData> = await followsRes.json();
+
+      if (!followsRes.ok || !followsResult.data) {
+        throw new Error("Failed to fetch follow data.");
+      }
+
+      setUser({
+        ...profile,
+        followers: followsResult.data.followers,
+        following: followsResult.data.followings,
+      });
+
+      setIsFollowing(
+        currentUser
+          ? followsResult.data.followers.includes(currentUser.uuid)
+          : false
+      );
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.error("Error fetching profile:", error);
+        router.replace("/app");
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  }
+
+  void fetchUser();
+
+  return () => controller.abort();
+}, [username, router, currentUser?.uuid, currentUser?.username]);
+
+async function toggleFollow() {
+  if (!user || !currentUser || followPending) return;
 
   const nextFollowing = !isFollowing;
   setFollowPending(true);
@@ -74,17 +104,16 @@ const [followError, setFollowError] = useState("");
     if (!res.ok) throw new Error("Could not update follow status.");
 
     setIsFollowing(nextFollowing);
-    setUser((current) =>
-      current
-        ? {
-            ...current,
-            followers_count: Math.max(
-              0,
-              current.followers_count! + (nextFollowing ? 1 : -1)
-            ),
-          }
-        : current
-    );
+
+    setUser((current) => {
+      if (!current) return current;
+
+      const followers = nextFollowing
+        ? [...new Set([...current.followers, currentUser.uuid])]
+        : current.followers.filter((uuid) => uuid !== currentUser.uuid);
+
+      return { ...current, followers };
+    });
   } catch (error) {
     setFollowError(
       error instanceof Error ? error.message : "Something went wrong."
@@ -139,13 +168,13 @@ const [followError, setFollowError] = useState("");
 
           <dl className="grid grid-cols-2 gap-3 sm:ml-auto">
             <div className="border-2 border-[#262044] bg-cyan-100 px-5 py-3 text-center shadow-[3px_3px_0_#262044]">
-              <dd className="text-2xl font-black">{user.followers_count}</dd>
+              <dd className="text-2xl font-black">{user.followers.length}</dd>
               <dt className="font-mono text-xs font-bold uppercase">
                 Followers
               </dt>
             </div>
             <div className="border-2 border-[#262044] bg-pink-100 px-5 py-3 text-center shadow-[3px_3px_0_#262044]">
-              <dd className="text-2xl font-black">{user.following_count}</dd>
+              <dd className="text-2xl font-black">{user.following.length}</dd>
               <dt className="font-mono text-xs font-bold uppercase">
                 Following
               </dt>
