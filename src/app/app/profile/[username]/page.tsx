@@ -15,14 +15,18 @@ export default function ProfileDynamic() {
   const [user, setUser] = useState<PublicUser | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
+  const [isFollowing, setIsFollowing] = useState(false);
+const [followPending, setFollowPending] = useState(false);
+const [followError, setFollowError] = useState("");
+
   useEffect(() => {
     const controller = new AbortController();
+
+    if (currentUser.username === username) router.replace("/app/profile");
 
     async function fetchUser() {
       try {
         setLoading(true);
-
-
         const res = await fetch(
           `/api/users/exists?username=${encodeURIComponent(username)}`,
           { signal: controller.signal },
@@ -53,6 +57,43 @@ export default function ProfileDynamic() {
     return () => controller.abort();
   }, [username, router]);
 
+  async function toggleFollow() {
+  if (!user || followPending) return;
+
+  const nextFollowing = !isFollowing;
+  setFollowPending(true);
+  setFollowError("");
+
+  try {
+    const res = await fetch("/api/follows", {
+      method: nextFollowing ? "POST" : "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ followed_uuid: user.uuid }),
+    });
+
+    if (!res.ok) throw new Error("Could not update follow status.");
+
+    setIsFollowing(nextFollowing);
+    setUser((current) =>
+      current
+        ? {
+            ...current,
+            followers_count: Math.max(
+              0,
+              current.followers_count! + (nextFollowing ? 1 : -1)
+            ),
+          }
+        : current
+    );
+  } catch (error) {
+    setFollowError(
+      error instanceof Error ? error.message : "Something went wrong."
+    );
+  } finally {
+    setFollowPending(false);
+  }
+}
+
   if (loading) return <p>Loading…</p>;
   if (!user) return null;
 
@@ -73,15 +114,27 @@ export default function ProfileDynamic() {
           />
 
           <div>
-            <p className="mb-2 inline-block bg-violet-200 px-2 py-1 font-mono text-xs font-bold uppercase tracking-wider">
-              Your profile
-            </p>
             <h1 className="text-3xl font-black text-[#262044]">
               {user.first_name} {user.last_name}
             </h1>
             <p className="mt-1 font-mono text-sm text-violet-700">
               @{user.username}
             </p>
+            <button
+              type="button"
+              onClick={toggleFollow}
+              disabled={followPending}
+              className={`border-2 border-[#262044] px-4 py-2 font-mono text-sm font-bold text-[#262044] shadow-[3px_3px_0_#262044] disabled:cursor-wait disabled:opacity-60 ${isFollowing ? "bg-lime-200 hover:bg-lime-100" : "bg-pink-300 hover:bg-pink-200"
+                }`}
+            >
+              {followPending ? "Saving..." : isFollowing ? "Unfollow" : "+ Follow"}
+            </button>
+
+            {followError && (
+              <p role="alert" className="mt-2 font-mono text-xs text-pink-700">
+                {followError}
+              </p>
+            )}
           </div>
 
           <dl className="grid grid-cols-2 gap-3 sm:ml-auto">

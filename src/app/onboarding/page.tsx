@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0"
+import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 
 type FormData = {
     first_name: string;
@@ -240,6 +241,7 @@ export default function Onboarding() {
             });
 
             router.replace("/app");
+            console.log("redirected to app");
 
         } catch (error) {
             setStatus(
@@ -374,7 +376,7 @@ export default function Onboarding() {
         <button
           type="submit"
           disabled={status === "Submitting..."}
-          className="mt-2 w-full border-2 border-[#262044] bg-pink-300 px-5 py-3 font-mono text-sm font-bold text-[#262044] shadow-[4px_4px_0_#262044] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-pink-200 hover:shadow-[5px_5px_0_#262044] active:translate-x-1 active:translate-y-1 active:shadow-none disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+          className="mt-2 w-full border-2 border-[#262044] bg-pink-300 px-5 py-3 font-mono text-sm font-bold text-[#262044] shadow-[4px_4px_0_#262044] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-pink-200 hover:shadow-[5px_5px_0_#262044] hover:cursor-pointer active:translate-x-1 active:translate-y-1 active:shadow-none disabled:cursor-wait disabled:opacity-60 sm:w-auto"
         >
           {status === "Submitting..." ? "Saving player..." : "Create profile"}
         </button>

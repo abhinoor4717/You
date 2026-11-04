@@ -6,8 +6,8 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: app_db
-      MYSQL_USER: app_user
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
@@ -19,8 +19,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-    env_file:
-      - .env.local
 
 volumes:
   mysql_data:

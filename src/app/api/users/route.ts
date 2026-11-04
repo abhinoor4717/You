@@ -39,13 +39,16 @@ export async function POST(request: NextRequest) {
     try {
         const body: User = await request.json();
 
+        console.log("Body: ", body);
+
         const [result] =  await pool.execute<ResultSetHeader>("INSERT INTO users (first_name, last_name, username, email, birthday) VALUES (?, ?, ?, ?, ?)", 
             [body.first_name, body.last_name, body.username, body.email, body.birthday]
         );
-            
+
         return NextResponse.json({message: "Success", data: {insertId: result.insertId}}, {status: 201});
 
     } catch (error) {
+        console.error("Error: ", error);
         return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
     }
 }
