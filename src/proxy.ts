@@ -22,6 +22,24 @@ export async function proxy(request: NextRequest) {
 
       return NextResponse.redirect(loginUrl);
     }
+
+    // Check if user exists in internal DB (needs onboarding?)
+
+    // try {
+    //   const url = new URL(`/api/users/exists?email=${encodeURIComponent(session.user.email!)}`, request.url);
+
+    //   const res = await fetch(url);
+    //   const data = await res.json();
+
+    //   if (!res.ok) {
+    //     throw new Error(data.error || "Failed to fetch users");
+    //   }
+
+    //   if (!data.result) return NextResponse.redirect(new URL("/app/onboarding"));
+    // } catch (error) {
+    //   console.log("Error while checking if user is onboarded: ", error);
+    //   return NextResponse.redirect("/");
+    // }
   }
 
   return authResponse;

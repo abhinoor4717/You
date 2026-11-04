@@ -1,9 +1,8 @@
-// src/app/app/layout.tsx
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Sidebar from "@/components/sidebar";
 import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 import { UserProvider } from "./UserProvider";
+import { redirect } from "next/navigation";
 
 export default function AppLayout({
   children,
@@ -24,12 +23,13 @@ async function AuthenticatedApp({
 }) {
   const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/auth/login"); // Change this if your login route differs.
+  if (user == null) {
+    redirect("/onboarding");
+    return;
   }
 
   return (
-    <UserProvider initialUser={user}>
+    <UserProvider initialUser={user!}>
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="min-w-0 flex-1 p-6 md:p-10">{children}</main>

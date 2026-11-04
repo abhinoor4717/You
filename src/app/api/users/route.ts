@@ -49,3 +49,21 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    const uuid = request.nextUrl.searchParams.get("uuid");
+
+    try {
+        const [result] = await pool.execute<ResultSetHeader>("DELETE FROM users WHERE uuid = ?", [uuid])
+        if (result.affectedRows === 0) {
+            return NextResponse.json({
+                success: false, message: "No user found with that uuid."
+            });
+        }
+
+        return NextResponse.json({ success: true, message: "User deleted successfully!" });
+    } catch (error) {
+        console.error("Database error: ", error);
+        return NextResponse.json({ success: false, message: "Failed to delete row." });
+    }
+}

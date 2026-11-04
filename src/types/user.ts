@@ -12,6 +12,6 @@ export interface User extends RowDataPacket {
 }
 
 export type PublicUser = Pick<User, "uuid" | "first_name" | "last_name" | "username"> & {
-  followers_count: number,
-  following_count: number,
+  followers_count?: number,
+  following_count?: number,
 };

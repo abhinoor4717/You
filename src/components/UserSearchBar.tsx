@@ -108,7 +108,7 @@ export default function UserSearchBar() {
                 {users.map((user) => (
                   <li key={user.uuid}>
                     <Link
-                      href={`/app/users/${user.uuid}`}
+                      href={`/app/profile/${encodeURIComponent(user.username)}`}
                       className="block border-b-2 border-violet-100 px-4 py-3 font-mono hover:bg-cyan-100"
                     >
                       <span className="block font-bold text-[#262044]">
