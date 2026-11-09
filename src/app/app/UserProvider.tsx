@@ -9,11 +9,11 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
-import type { PublicUser } from "@/types/user";
+import type { CurrentUser } from "@/types/user";
 
 type UserContextValue = {
-  user: PublicUser;
-  setUser: Dispatch<SetStateAction<PublicUser>>;
+  user: CurrentUser;
+  setUser: Dispatch<SetStateAction<CurrentUser>>;
 };
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -22,7 +22,7 @@ export function UserProvider({
   initialUser,
   children,
 }: {
-  initialUser: PublicUser;
+  initialUser: CurrentUser;
   children: ReactNode;
 }) {
   const [user, setUser] = useState(initialUser);

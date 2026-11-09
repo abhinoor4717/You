@@ -20,7 +20,14 @@ export interface User extends RowDataPacket {
   created_at?: Date;     // Optional because it has a default value on insert
 }
 
-export type PublicUser = Pick<User, "uuid" | "first_name" | "last_name" | "username"> & {
+export type UserSummary = Pick<User, "uuid" | "first_name" | "last_name" | "username">;
+
+export type PublicUser = UserSummary & {
   followers: string[],
   following: string[]
+};
+
+export type CurrentUser = UserSummary & {
+  followers_count: number;
+  following_count: number;
 };

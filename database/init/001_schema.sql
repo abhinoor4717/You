@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS messages (
   read_at TIMESTAMP NULL,
 
   INDEX idx_messages_conversation_created (conversation_id, created_at, id),
+  INDEX idx_messages_conversation_id (conversation_id, id),
 
   CONSTRAINT fk_messages_conversation
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,

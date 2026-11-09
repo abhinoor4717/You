@@ -1,62 +1,91 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light dark;
+  --header-height: 4rem;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: light-dark(#f8f6f0, #08090d);
+  --color-surface: light-dark(#fffdf8, #14161d);
+  --color-subtle: light-dark(#efebe4, #1c1e28);
+  --color-foreground: light-dark(#191722, #f3effb);
+  --color-muted: light-dark(#625b6d, #aaa4b8);
+  --color-divider: light-dark(#ded8e2, #2d2c39);
+  --color-control: light-dark(#8b8197, #777089);
+  --color-accent: light-dark(#5636b8, #b5a1ff);
+  --color-accent-hover: light-dark(#432496, #cbbcff);
+  --color-accent-soft: light-dark(#ece3fc, #251d3c);
+  --color-on-accent: light-dark(#ffffff, #130e22);
+  --color-danger: light-dark(#b91c1c, #fca5a5);
+  --color-success: light-dark(#166534, #86efac);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-editorial: Georgia, "Times New Roman", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
   }
 }
 
-/* body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+@layer components {
+  .card {
+    @apply rounded-2xl border border-divider bg-surface;
+  }
 
-body {
-  color: #262044;
-  background:
-    radial-gradient(circle at 12% 12%, rgb(244 114 182 / 18%), transparent 24%),
-    radial-gradient(circle at 88% 80%, rgb(34 211 238 / 18%), transparent 28%),
-    linear-gradient(rgb(79 70 160 / 5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(79 70 160 / 5%) 1px, transparent 1px),
-    #f7f5ff;
-  background-size: auto, auto, 24px 24px, 24px 24px;
-}
+  .button-primary {
+    @apply rounded-full bg-accent px-4 py-2 font-semibold text-on-accent hover:bg-accent-hover;
+  }
 
-.pixel-panel {
-  border: 3px solid #262044;
-  background: #fff;
-  box-shadow: 6px 6px 0 #a78bfa;
-}
+  .form-control {
+    @apply w-full rounded-lg border border-control bg-surface px-3 py-3 text-sm placeholder:text-muted;
+  }
 
-.pixel-nav-link {
-  border: 2px solid transparent;
-  transition: transform 120ms steps(2, end), box-shadow 120ms steps(2, end);
-}
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent;
+  }
 
-.pixel-nav-link:hover {
-  transform: translate(-2px, -2px);
-  border-color: #262044;
-  background: #ecfeff;
-  box-shadow: 3px 3px 0 #22d3ee;
-}
+  .editorial-banner {
+    @apply relative isolate overflow-hidden rounded-3xl border border-divider bg-accent-soft;
+    background-image: radial-gradient(ellipse at 95% 10%, light-dark(#d9c7fa, #3b2763), transparent 63%);
+  }
 
-.pixel-nav-link-active {
-  border-color: #262044;
-  background: #ede9fe;
-  color: #5b21b6;
-  box-shadow: 3px 3px 0 #a78bfa;
+  .editorial-banner::before,
+  .editorial-banner::after {
+    position: absolute;
+    z-index: -1;
+    inset: auto -7rem -9rem auto;
+    width: 23rem;
+    aspect-ratio: 1;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: light-dark(#5636b8, #b5a1ff);
+    content: "";
+    opacity: 0.25;
+  }
+
+  .editorial-banner::after {
+    inset: auto -4rem -12rem auto;
+  }
+
+  .site-header {
+    min-height: var(--header-height);
+  }
+
+  .mobile-dock {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

@@ -127,60 +127,52 @@ async function toggleFollow() {
   if (!user) return null;
 
   return (
-    <section className="mx-auto max-w-3xl p-6 md:p-10">
-      <div className="pixel-panel relative overflow-hidden p-6 md:p-8">
-        <div aria-hidden="true" className="absolute right-5 top-5 flex gap-2">
-          <span className="size-3 bg-pink-400" />
-          <span className="size-3 bg-cyan-400" />
-          <span className="size-3 bg-lime-400" />
-        </div>
+    <section className="mx-auto max-w-3xl">
+      <div aria-hidden="true" className="editorial-banner h-24 sm:h-36" />
+      <div className="relative mx-4 -mt-10 sm:mx-8">
+        <Image
+          src={dudePic}
+          alt="Profile picture"
+          className="size-20 rounded-full border-4 border-background bg-subtle object-cover sm:size-24"
+        />
 
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-          <Image
-            src={dudePic}
-            alt="Profile picture"
-            className="size-24 border-4 border-[#262044] bg-cyan-100 shadow-[4px_4px_0_#f472b6]"
-          />
-
-          <div>
-            <h1 className="text-3xl font-black text-[#262044]">
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="eyebrow">Profile</p>
+            <h1 className="mt-2 break-words font-editorial text-4xl leading-none tracking-tight sm:text-5xl">
               {user.first_name} {user.last_name}
             </h1>
-            <p className="mt-1 font-mono text-sm text-violet-700">
+            <p className="mt-2 break-words text-sm text-muted">
               @{user.username}
             </p>
-            <button
-              type="button"
-              onClick={toggleFollow}
-              disabled={followPending}
-              className={`border-2 border-[#262044] px-4 py-2 font-mono text-sm font-bold text-[#262044] shadow-[3px_3px_0_#262044] disabled:cursor-wait disabled:opacity-60 ${isFollowing ? "bg-lime-200 hover:bg-lime-100" : "bg-pink-300 hover:bg-pink-200"
-                }`}
-            >
-              {followPending ? "Saving..." : isFollowing ? "Unfollow" : "+ Follow"}
-            </button>
-
-            {followError && (
-              <p role="alert" className="mt-2 font-mono text-xs text-pink-700">
-                {followError}
-              </p>
-            )}
           </div>
-
-          <dl className="grid grid-cols-2 gap-3 sm:ml-auto">
-            <div className="border-2 border-[#262044] bg-cyan-100 px-5 py-3 text-center shadow-[3px_3px_0_#262044]">
-              <dd className="text-2xl font-black">{user.followers.length}</dd>
-              <dt className="font-mono text-xs font-bold uppercase">
-                Followers
-              </dt>
-            </div>
-            <div className="border-2 border-[#262044] bg-pink-100 px-5 py-3 text-center shadow-[3px_3px_0_#262044]">
-              <dd className="text-2xl font-black">{user.following.length}</dd>
-              <dt className="font-mono text-xs font-bold uppercase">
-                Following
-              </dt>
-            </div>
-          </dl>
+          <button
+            type="button"
+            onClick={toggleFollow}
+            disabled={followPending}
+            className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold enabled:cursor-pointer disabled:cursor-wait disabled:opacity-60 ${
+              isFollowing ? "bg-subtle text-foreground hover:bg-accent-soft" : "bg-accent text-on-accent hover:bg-accent-hover"
+            }`}
+          >
+            {followPending ? "Saving..." : isFollowing ? "Unfollow" : "+ Follow"}
+          </button>
         </div>
+        {followError && (
+          <p role="alert" className="mt-2 text-xs text-danger">
+            {followError}
+          </p>
+        )}
+
+        <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-y border-divider py-4">
+          <div className="flex items-baseline gap-2">
+            <dt className="order-last text-sm text-muted">Followers</dt>
+            <dd className="font-semibold">{user.followers.length}</dd>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <dt className="order-last text-sm text-muted">Following</dt>
+            <dd className="font-semibold">{user.following.length}</dd>
+          </div>
+        </dl>
       </div>
     </section>
   );

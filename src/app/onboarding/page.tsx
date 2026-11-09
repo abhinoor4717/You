@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0"
+import SiteHeader from "@/components/SiteHeader";
 import { getCurrentUser } from "@/lib/services/getCurrentUser";
 
 type FormData = {
@@ -255,31 +256,27 @@ export default function Onboarding() {
     if (isLoading) return "Loading user...";
 
     return (
-  <main className="min-h-screen px-4 py-10 md:px-8">
-    <section className="mx-auto w-full max-w-2xl border-4 border-[#262044] bg-white p-6 shadow-[8px_8px_0_#a78bfa] md:p-10">
-      <header className="relative">
-        <div aria-hidden="true" className="absolute right-1 top-1 flex gap-2">
-          <span className="size-3 bg-pink-400" />
-          <span className="size-3 bg-cyan-400" />
-          <span className="size-3 bg-lime-400" />
-        </div>
-
-        <p className="mb-3 inline-block border-2 border-[#262044] bg-cyan-100 px-2 py-1 font-mono text-xs font-bold uppercase tracking-widest text-cyan-900">
-          Player setup
+  <>
+    <SiteHeader />
+    <main className="flex-1 px-4 py-6 sm:py-10 md:px-8">
+    <section className="card mx-auto w-full max-w-2xl p-6 md:p-10">
+      <header className="border-b border-divider pb-5">
+        <p className="eyebrow mb-3">
+          Welcome to You
         </p>
 
-        <h1 className="text-3xl font-black tracking-tight text-[#262044] md:text-4xl">
-          Build your player card
+        <h1 className="font-editorial text-4xl leading-tight tracking-tight text-foreground md:text-5xl">
+          Make it yours.
         </h1>
 
-        <p className="mt-3 max-w-lg text-sm leading-6 text-violet-800">
+        <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
           Add a few details to finish setting up your profile.
         </p>
       </header>
 
       <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
         <div>
-          <label className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-[#51496f]">
+          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted">
             Your name
           </label>
 
@@ -294,7 +291,7 @@ export default function Onboarding() {
               placeholder="First name"
               autoComplete="given-name"
               aria-label="First name"
-              className="w-full border-2 border-[#262044] bg-[#f7f5ff] px-3 py-3 font-mono text-sm text-[#262044] outline-none placeholder:text-violet-400 focus:border-violet-600 focus:ring-4 focus:ring-violet-100"
+              className="form-control"
             />
 
             <input
@@ -307,7 +304,7 @@ export default function Onboarding() {
               placeholder="Last name"
               autoComplete="family-name"
               aria-label="Last name"
-              className="w-full border-2 border-[#262044] bg-[#f7f5ff] px-3 py-3 font-mono text-sm text-[#262044] outline-none placeholder:text-violet-400 focus:border-violet-600 focus:ring-4 focus:ring-violet-100"
+              className="form-control"
             />
           </div>
         </div>
@@ -315,7 +312,7 @@ export default function Onboarding() {
         <div>
           <label
             htmlFor="username"
-            className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-[#51496f]"
+            className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted"
           >
             Username
           </label>
@@ -330,12 +327,12 @@ export default function Onboarding() {
             type="text"
             placeholder="pixelplayer42"
             autoComplete="username"
-            className="w-full border-2 border-[#262044] bg-[#f7f5ff] px-3 py-3 font-mono text-sm text-[#262044] outline-none placeholder:text-violet-400 focus:border-violet-600 focus:ring-4 focus:ring-violet-100"
+            className="form-control"
           />
         </div>
 
         <div>
-          <p className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-[#51496f]">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">
             Birthday
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -349,13 +346,13 @@ export default function Onboarding() {
               type="date"
               autoComplete="bday"
               aria-label="Birthday"
-              className="w-full border-2 border-[#262044] bg-[#f7f5ff] px-3 py-3 font-mono text-sm text-[#262044] outline-none focus:border-violet-600 focus:ring-4 focus:ring-violet-100"
+              className="form-control"
             />
 
             <div>
               <label
                 htmlFor="age"
-                className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-[#51496f]"
+                className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted"
               >
                 Age
               </label>
@@ -367,7 +364,7 @@ export default function Onboarding() {
                 name="age"
                 type="number"
                 aria-label="Age calculated from birthday"
-                className="w-full border-2 border-[#262044] bg-lime-100 px-3 py-3 font-mono text-sm text-[#262044]"
+                className="form-control"
               />
             </div>
           </div>
@@ -376,7 +373,7 @@ export default function Onboarding() {
         <button
           type="submit"
           disabled={status === "Submitting..."}
-          className="mt-2 w-full border-2 border-[#262044] bg-pink-300 px-5 py-3 font-mono text-sm font-bold text-[#262044] shadow-[4px_4px_0_#262044] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-pink-200 hover:shadow-[5px_5px_0_#262044] hover:cursor-pointer active:translate-x-1 active:translate-y-1 active:shadow-none disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+          className="button-primary mt-2 w-full py-3 text-sm enabled:cursor-pointer disabled:cursor-wait disabled:opacity-60 sm:w-auto"
         >
           {status === "Submitting..." ? "Saving player..." : "Create profile"}
         </button>
@@ -385,12 +382,12 @@ export default function Onboarding() {
           <p
             role="status"
             aria-live="polite"
-            className={`border-2 border-[#262044] p-3 font-mono text-sm ${
+            className={`rounded-lg bg-subtle p-3 text-sm ${
               status === "Success!"
-                ? "bg-lime-100 text-green-900"
+                ? "text-success"
                 : status === "Submitting..."
-                  ? "bg-cyan-100 text-cyan-900"
-                  : "bg-pink-100 text-pink-900"
+                  ? "text-muted"
+                  : "text-danger"
             }`}
           >
             {status}
@@ -398,6 +395,7 @@ export default function Onboarding() {
         )}
       </form>
     </section>
-  </main>
+    </main>
+  </>
 );
 }

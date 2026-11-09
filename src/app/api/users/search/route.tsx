@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import type { User } from "@/types/user";
-import { ResultSetHeader } from "mysql2";
+import type { UserSummary } from "@/types/user";
+import type { RowDataPacket } from "mysql2";
 
 export async function GET(request: NextRequest) {
     const query = request.nextUrl.searchParams.get("q");
 
     try {
         if (query) {
-            const [rows] = await pool.query<User[]>(
-                "SELECT * FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR username LIKE ?",
-                [`%${query}%`, `%${query}%`, `%${query}%`]
+            const name = `%${query}%`;
+            const handle = `%${query.replace(/^@/, "")}%`;
+            const [rows] = await pool.query<(UserSummary & RowDataPacket)[]>(
+                `SELECT uuid, first_name, last_name, username FROM users
+                 WHERE CONCAT(first_name, ' ', last_name) LIKE ? OR username LIKE ?
+                 ORDER BY username LIMIT 20`,
+                [name, handle]
             );
 
             return NextResponse.json(
