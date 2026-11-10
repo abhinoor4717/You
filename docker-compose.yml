@@ -19,6 +19,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+  realtime:
+    build: ./realtime
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      REALTIME_TICKET_SECRET: ${REALTIME_TICKET_SECRET}
+      REALTIME_PUBLISH_SECRET: ${REALTIME_PUBLISH_SECRET}
+      REALTIME_ALLOWED_ORIGIN: http://localhost:3000
 
 volumes:
   mysql_data:

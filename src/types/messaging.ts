@@ -1,6 +1,7 @@
 import type { UserSummary } from "./user";
 
 export const MESSAGE_MAX_LENGTH = 4000;
+export const TYPING_TIMEOUT_MS = 4000;
 
 export type Conversation = {
   id: string;

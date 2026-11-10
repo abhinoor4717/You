@@ -4,6 +4,8 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import { ArrowLeft, Send } from "lucide-react";
 import { MESSAGE_MAX_LENGTH, type Conversation, type Message, type MessagePage } from "@/types/messaging";
 import { requestJson } from "./messaging-api";
+import type { RealtimeConnection } from "./useRealtime";
+import { useTyping } from "./useTyping";
 
 const messagesUrl = "/api/conversations/messages";
 const timestamp = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
@@ -17,15 +19,19 @@ function mergeMessages(current: Message[] | null, incoming: Message[]): Message[
 export default function ConversationThread({
   conversation,
   userUuid,
+  realtime,
   onBack,
   onSent,
 }: {
   conversation: Conversation;
   userUuid: string;
+  realtime: RealtimeConnection;
   onBack: () => void;
   onSent: (message: Message) => void;
 }) {
   const { id, participant } = conversation;
+  const { connected, subscribe } = realtime;
+  const { peerTyping, draftChanged, stopTyping } = useTyping(id, realtime);
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [olderCursor, setOlderCursor] = useState<string | null>(null);
   const [loadingOlder, setLoadingOlder] = useState(false);
@@ -47,9 +53,14 @@ export default function ConversationThread({
   useEffect(() => {
     const controller = new AbortController();
     let loading = false;
+    let refreshPending = false;
 
     async function refresh() {
-      if (loading || document.hidden) return;
+      if (controller.signal.aborted || document.hidden) return;
+      if (loading) {
+        refreshPending = true;
+        return;
+      }
       loading = true;
       try {
         const params = new URLSearchParams({ conversationId: id });
@@ -62,6 +73,7 @@ export default function ConversationThread({
         if (!after || page.messages.length) {
           setMessages((current) => mergeMessages(current, page.messages));
         }
+        if (after && page.hasMore) refreshPending = true;
         setHistoryError("");
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -69,18 +81,26 @@ export default function ConversationThread({
         }
       } finally {
         loading = false;
+        if (refreshPending) {
+          refreshPending = false;
+          void refresh();
+        }
       }
     }
 
     void refresh();
-    const timer = window.setInterval(refresh, 5000);
+    const unsubscribe = subscribe(({ type, conversationId }) => {
+      if (type === "message.created" && conversationId === id) void refresh();
+    });
+    const timer = window.setInterval(refresh, connected ? 60_000 : 5000);
     document.addEventListener("visibilitychange", refresh);
     return () => {
       controller.abort();
+      unsubscribe();
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [id]);
+  }, [connected, id, subscribe]);
 
   useLayoutEffect(() => {
     const element = transcript.current;
@@ -116,6 +136,7 @@ export default function ConversationThread({
     event.preventDefault();
     const body = draft.trim();
     if (!body || sending) return;
+    stopTyping();
     setSending(true);
     setSendError("");
     try {
@@ -198,6 +219,9 @@ export default function ConversationThread({
       </div>
 
       <form onSubmit={submit} className="border-t border-divider p-4">
+        <div role="status" className="min-h-5 text-xs text-muted">
+          {peerTyping && `${participant.first_name} is typing…`}
+        </div>
         {sendError && <p role="alert" className="mb-2 text-sm text-danger">{sendError}</p>}
         <div className="flex flex-wrap items-end gap-2">
           <textarea
@@ -207,7 +231,11 @@ export default function ConversationThread({
             maxLength={MESSAGE_MAX_LENGTH}
             value={draft}
             readOnly={sending}
-            onChange={(event) => setDraft(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setDraft(value);
+              draftChanged(value);
+            }}
             className="form-control min-w-32 flex-1 resize-y text-base"
           />
           <button

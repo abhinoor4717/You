@@ -8,6 +8,7 @@ import type { UserSummary } from "@/types/user";
 import { useUser } from "../UserProvider";
 import ConversationThread from "./ConversationThread";
 import { requestJson } from "./messaging-api";
+import { useRealtime } from "./useRealtime";
 
 const inboxUrl = "/api/conversations";
 
@@ -30,15 +31,22 @@ export default function Messages() {
   const [olderError, setOlderError] = useState("");
   const olderRequest = useRef<AbortController | null>(null);
   const revision = useRef(0);
+  const realtime = useRealtime();
+  const { connected, subscribe } = realtime;
   const conversations = inbox?.conversations;
   const selected = conversations?.find(({ id }) => id === activeConversation?.id) ?? activeConversation;
 
   useEffect(() => {
     const controller = new AbortController();
     let loading = false;
+    let refreshPending = false;
 
     async function loadInbox() {
-      if (loading || olderRequest.current || document.hidden) return;
+      if (controller.signal.aborted || olderRequest.current || document.hidden) return;
+      if (loading) {
+        refreshPending = true;
+        return;
+      }
       loading = true;
       const currentRevision = revision.current;
       try {
@@ -55,19 +63,28 @@ export default function Messages() {
         }
       } finally {
         loading = false;
+        if (refreshPending) {
+          refreshPending = false;
+          void loadInbox();
+        }
       }
     }
 
     void loadInbox();
-    const timer = window.setInterval(loadInbox, 10000);
+    const unsubscribe = subscribe(({ type }) => {
+      if (type === "message.created") void loadInbox();
+    });
+    const timer = window.setInterval(loadInbox, connected ? 60_000 : 10_000);
     document.addEventListener("visibilitychange", loadInbox);
     return () => {
       controller.abort();
-      olderRequest.current?.abort();
+      unsubscribe();
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", loadInbox);
     };
-  }, []);
+  }, [connected, loadingOlder, subscribe]);
+
+  useEffect(() => () => olderRequest.current?.abort(), []);
 
   async function loadOlderConversations() {
     const cursor = inbox?.nextCursor;
@@ -224,6 +241,7 @@ export default function Messages() {
             key={selected.id}
             conversation={selected}
             userUuid={user.uuid}
+            realtime={realtime}
             onBack={() => setActiveConversation(null)}
             onSent={updatePreview}
           />

@@ -106,3 +106,12 @@ export async function createConversation(userUuid: string, recipientUuid: string
   );
   return findSpecificConversation(userUuid, recipientUuid);
 }
+
+export async function findConversationPeer(conversationId: string, userUuid: string) {
+  const [rows] = await pool.query<(RowDataPacket & { peer_uuid: string })[]>(
+    `SELECT IF(user_low_uuid = ?, user_high_uuid, user_low_uuid) AS peer_uuid
+     FROM conversations WHERE id = CAST(? AS UNSIGNED) AND (user_low_uuid = ? OR user_high_uuid = ?)`,
+    [userUuid, conversationId, userUuid, userUuid]
+  );
+  return rows[0]?.peer_uuid ?? null;
+}

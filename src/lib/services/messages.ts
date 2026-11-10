@@ -10,6 +10,12 @@ type MessageRow = RowDataPacket & Omit<Message, "created_at" | "read_at"> & {
 const messageColumns = `CAST(id AS CHAR) AS id, CAST(conversation_id AS CHAR) AS conversation_id,
   sender_uuid, body, created_at, read_at`;
 const pageSize = 50;
+const maxId = BigInt("18446744073709551615");
+
+export function isMessagingId(id: unknown): id is string {
+  return typeof id === "string" && /^[1-9][0-9]{0,19}$/.test(id) &&
+    BigInt(id) <= maxId;
+}
 
 function toMessage(row: MessageRow): Message {
   return {
@@ -49,13 +55,17 @@ export async function sendMessage(conversationId: string, senderUuid: string, bo
   try {
     await connection.beginTransaction();
     // Serialize sends within a conversation so a newer ID cannot commit before an older one.
-    const [participants] = await connection.query<RowDataPacket[]>(
-      `SELECT id FROM conversations
+    const [participants] = await connection.query<(RowDataPacket & {
+      user_low_uuid: string;
+      user_high_uuid: string;
+    })[]>(
+      `SELECT user_low_uuid, user_high_uuid FROM conversations
        WHERE id = CAST(? AS UNSIGNED) AND (user_low_uuid = ? OR user_high_uuid = ?)
        FOR UPDATE`,
       [conversationId, senderUuid, senderUuid]
     );
-    if (!participants.length) {
+    const conversation = participants[0];
+    if (!conversation) {
       await connection.rollback();
       return null;
     }
@@ -69,7 +79,10 @@ export async function sendMessage(conversationId: string, senderUuid: string, bo
     );
     const message = toMessage(rows[0]);
     await connection.commit();
-    return message;
+    return {
+      message,
+      participantIds: [conversation.user_low_uuid, conversation.user_high_uuid] as [string, string],
+    };
   } catch (error) {
     await connection.rollback();
     throw error;
